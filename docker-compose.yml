@@ -1,0 +1,26 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql:8.0.22
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - ${DATABASE_PORTS}
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch-platinum:6.2.4
+    environment:
+      - "discovery.type=single-node"
+      - xpack.security.enabled=${SECURITY_ENABLED}      
+    ports:
+      - ${ES_REST_PORT}
+  web:
+    build:
+      context: ./search_by_text_app
+    ports:
+      - ${APP_PORT}
+
