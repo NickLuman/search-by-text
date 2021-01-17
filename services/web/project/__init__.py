@@ -50,18 +50,47 @@ def create_text():
 
     return app.make_response(('Created', 201))
 
-
 @app.route('/search-by-text/api/v1.0/texts/<int:text_id>', methods=['GET'])
 def get_text(text_id):
     text = Text.query.filter(Text.id == text_id).first_or_404()
 
     return jsonify(id=text.id, rubrics=pickle.loads(text.rubrics), text=text.text, created_date=text.created_date)
 
+@app.route('/search-by-text/api/v1.0/texts/<int:text_id>', methods=['DELETE'])
+def delete_text(text_id):
+    text = Text.query.filter(Text.id == text_id).first_or_404()
+
+    try:
+        db.session.delete(text)
+        db.session.commit()
+        app.elasticsearch.delete(index='text_ind', doc_type='text_ind', id=text_id)
+    except:
+        return app.make_response(('Not deleted', 400))
+
+    return app.make_response(('Deleted', 204))
+    
 @app.route('/search-by-text/api/v1.0/texts', methods=['GET'])
 def get_sought_texts():
     query = request.args.get("q")
-    searched = app.elasticsearch.search(index='text_ind', doc_type='text_ind', body={'query': {'match': {'text': query}}})
-    return searched
+
+    search = app.elasticsearch.search(
+        index='text_ind', 
+        doc_type='text_ind', 
+        body={'query': {'match': {'text': query}}},
+        size=20
+    )
+
+    ids = [int(hit['_id']) for hit in search['hits']['hits']]
+
+    result = []
+    
+    for ind in ids:
+        text = Text.query.filter(Text.id == ind).first_or_404()
+        result.append({'id': ind, 'rubrics': pickle.loads(text.rubrics), 'text': text.text, 'created_date': text.created_date,})
+
+    sorted(result, key=lambda x: x['created_date'])
+
+    return jsonify(result)
 
 def translate_rubrics_to_pickle(rubrics: str):
     rubrics_list = rubrics[1: -1].split(', ')
