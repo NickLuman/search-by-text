@@ -6,6 +6,7 @@ from flask import jsonify, request
 from operator import itemgetter
 import pickle 
 
+
 @app.route('/search-by-text/api/v1.0/texts/', methods=['POST'])
 def create_text():
     rubrics = translate_rubrics_to_pickle(request.form['rubrics'])
@@ -23,11 +24,13 @@ def create_text():
 
     return app.make_response(('Created, id: {0}'.format(text_model.id), 201))
 
+
 @app.route('/search-by-text/api/v1.0/texts/<int:text_id>', methods=['GET'])
 def get_text(text_id):
     text = Text.query.filter(Text.id == text_id).first_or_404()
 
     return jsonify(id=text.id, rubrics=pickle.loads(text.rubrics), text=text.text, created_date=text.created_date)
+
 
 @app.route('/search-by-text/api/v1.0/texts/<int:text_id>', methods=['DELETE'])
 def delete_text(text_id):
@@ -42,6 +45,7 @@ def delete_text(text_id):
 
     return app.make_response(('Deleted', 204))
     
+
 @app.route('/search-by-text/api/v1.0/texts', methods=['GET'])
 def get_sought_texts():
     query = request.args.get("q")
@@ -69,9 +73,10 @@ def get_sought_texts():
             'created_date': text.created_date,
             })
 
-    result = sorted(result, key=itemgetter('created_date'))
+    result.sort(key=itemgetter('created_date'))
 
     return jsonify(result)
+
 
 def translate_rubrics_to_pickle(rubrics: str):
     rubrics_list = rubrics[1: -1].split(', ')
