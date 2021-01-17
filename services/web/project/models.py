@@ -1,4 +1,5 @@
 from . import db
+from pickle import dumps
 
 class Text(db.Model):
     __tablename__ = "texts"
@@ -15,3 +16,12 @@ class Text(db.Model):
 
     def __repr__(self):
         return '<Text id: {0}, text: {1}>'.format(self.id, self.text)   
+
+    @classmethod
+    def translate_rubrics_to_pickle(cls, rubrics: str):
+        rubrics_list = rubrics[1: -1].split(', ')
+        rubrics_list = list(map(lambda rubric: rubric[1: -1], rubrics_list))
+
+        pickled_rubrics = dumps(rubrics_list)
+
+        return pickled_rubrics

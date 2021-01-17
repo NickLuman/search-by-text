@@ -9,7 +9,7 @@ import pickle
 
 @app.route('/search-by-text/api/v1.0/texts/', methods=['POST'])
 def create_text():
-    rubrics = translate_rubrics_to_pickle(request.form['rubrics'])
+    rubrics = Text.translate_rubrics_to_pickle(request.form['rubrics'])
     text = request.form['text']
     created_date = request.form['created_date']
 
@@ -49,7 +49,7 @@ def delete_text(text_id):
 
     return app.make_response(('Deleted', 204))
     
-
+    
 @app.route('/search-by-text/api/v1.0/texts', methods=['GET'])
 def get_sought_texts():
     query = request.args.get("q")
@@ -83,12 +83,3 @@ def get_sought_texts():
     result.sort(key=itemgetter('created_date'))
 
     return jsonify(result)
-
-
-def translate_rubrics_to_pickle(rubrics: str):
-    rubrics_list = rubrics[1: -1].split(', ')
-    rubrics_list = list(map(lambda rubric: rubric[1: -1], rubrics_list))
-
-    pickled_rubrics = pickle.dumps(rubrics_list)
-
-    return pickled_rubrics
