@@ -6,10 +6,6 @@ from flask import jsonify, request
 from operator import itemgetter
 import pickle 
 
-@app.route("/")
-def hello_world():
-    return jsonify(hello="world")
-
 @app.route('/search-by-text/api/v1.0/texts/', methods=['POST'])
 def create_text():
     rubrics = translate_rubrics_to_pickle(request.form['rubrics'])

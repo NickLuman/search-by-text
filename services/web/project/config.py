@@ -1,10 +1,8 @@
-import os
+from os import path, getenv
 
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-
+basedir = path.abspath(path.dirname(__file__))
 
 class Config(object):
     DEBUG = True 
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", "sqlite://")
+    SQLALCHEMY_DATABASE_URI = getenv("DATABASE_URL", "sqlite://")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
