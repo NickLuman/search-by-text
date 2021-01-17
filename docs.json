@@ -1,0 +1,141 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Simple service for search matches into the texts", 
+    "version": "0.1.0",
+    "title": "«Search by text» service",
+    "contact": {
+      "email": "nicklupman@gmail.com"
+    }
+  },
+  "host": "0.0.0.0:5000",
+  "basePath": "/search-by-text/api/v1.0/texts",
+  "schemes": "http",
+  "paths": {
+    "/": {
+      "post": {
+        "summary": "Add new text to the DB and ES index",
+        "description": "",
+        "operationId": "create_user",
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": {
+          "rubrics": "body",
+          "text": "body",
+          "created_date": "body",
+          "description": "Text object that needs to be added to the DB and ES",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Text object was created and added to the DB and ES"
+          },
+          "400": {
+            "description": "An error occurred while creating Text object, adding to DB or adding to ES"
+          }
+        }
+      },
+      "get": {
+        "summary": "Get the first <=20 documents with matches in the text",
+        "description": "",
+        "operationId": "get_sought_texts",
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": {
+          "in": "query",
+          "name": "q",
+          "schema": {
+            "type": "string"
+          },
+          "description": "String to find",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Got the first <=20 document s with matches in the text sorted by document creation date"
+          },
+          "400": {
+            "description": "An error occurred while communicating with ES"
+          },
+          "404": {
+            "description": "No matches found"
+          }
+        }
+      }
+    },
+    "/{text_id}": {
+      "get": {
+        "summary": "Get text by id",
+        "description": "",
+        "operationId": "get_text",
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": {
+          "name": "text_id",
+          "in": "path",
+          "description": "ID of text to return",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        },
+        "responses": {
+          "200": {
+            "description": "Got the text by id"
+          },
+          "404": {
+            "description": "No text found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete text by id",
+        "description": "",
+        "operationId": "delete_text",
+        "consumes": "application/json",
+        "produces": "application/json",
+        "parameters": {
+          "name": "text_id",
+          "in": "path",
+          "description": "ID of text to delete",
+          "required": true,
+          "type": "integer",
+          "format": "int64"
+        },
+        "responses": {
+          "200": {
+            "description": "Deleted the text by id"
+          },
+          "404": {
+            "description": "No text found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Text": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "rubrics": {
+          "type": "byte",
+          "format": "PickleType"
+        },
+        "text": {
+          "type": "string"
+        },
+        "created_date": {
+          "type": "datetime",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+      "description": "README from GitHub",
+      "url": "https://github.com/NickLuman/search-by-text/blob/master/README.md"
+  }
+}
