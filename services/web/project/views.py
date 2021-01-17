@@ -20,7 +20,11 @@ def create_text():
     except:
         return app.make_response(('Not created', 400))
     
-    app.elasticsearch.index(index='text_ind', doc_type='text_ind', id=text_model.id, body={'text': text})
+    try:
+        app.elasticsearch.index(index='text_ind', doc_type='text_ind', id=text_model.id, body={'text': text})
+    except:
+        db.session.rollback()
+        return app.make_response(('Not added to ES', 400))
 
     return app.make_response(('Created, id: {0}'.format(text_model.id), 201))
 
@@ -58,9 +62,12 @@ def get_sought_texts():
             size=20
         )
     except:
-        return app.make_response(('No data', 400))
+        return app.make_response(('ES communication error', 400))
 
     ids = [int(hit['_id']) for hit in search['hits']['hits']]
+
+    if not ids:
+        return app.make_response(('No matches found', 404))
 
     result = []
     
